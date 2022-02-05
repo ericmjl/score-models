@@ -1,47 +1,49 @@
 name: score-models
 channels:
-- conda-forge
+  - conda-forge
 dependencies:
-# Core stack
-- python=3.9
-- build
-- bump2version
-- ipykernel
-- ipywidgets
-- jupyter
-- jupyterlab
-- mamba
-- pip
-- twine
-# Standard PyData stack
-- matplotlib
-- numpy
-- pandas
-- pymc3
-- scikit-learn
-- scipy
-- seaborn
-- statsmodels
-# Utilities
-- pyprojroot
-- python-dotenv
-# CLI development
-- typer
-# Software testing
-- hypothesis
-- pytest
-# Code Style Tools
-- black
-- darglint
-- flake8
-- interrogate
-- pre-commit
-- pylint
-# Documentation
-- mkdocs
-- mkdocs-material
-- mkdocstrings
-# pip dependencies
-- pip:
-  # Place packages that cannot be installed by conda in this section.
-  - mknotebooks
+  # Core stack
+  - python=3.9
+  - build
+  - bump2version
+  - ipykernel
+  - ipywidgets
+  - jupyter
+  - jupyterlab
+  - mamba
+  - pip
+  - twine
+  # Standard PyData stack
+  - matplotlib
+  - numpy
+  - pandas
+  - pymc
+  - scikit-learn
+  - scipy
+  - seaborn
+  - statsmodels
+  # Utilities
+  - pyprojroot
+  - python-dotenv
+  # CLI development
+  - typer
+  # Software testing
+  - hypothesis
+  - pytest
+  # Code Style Tools
+  - black
+  - darglint
+  - flake8
+  - interrogate
+  - pre-commit
+  - pylint
+  # Documentation
+  - mkdocs
+  - mkdocs-material
+  - mkdocstrings
+  # pip dependencies
+  - pip:
+      # Place packages that cannot be installed by conda in this section.
+      - mknotebooks
+      - jax
+      - jaxlib
