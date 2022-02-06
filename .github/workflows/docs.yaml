@@ -35,16 +35,14 @@ jobs:
           conda activate score-models
           python -m ipykernel install --user --name score-models
           pip install -e .
-          typer score-models.cli utils docs --name score-models --output docs/cli.md
+          typer score_models.cli utils docs --name score-models --output docs/cli.md
           mkdocs build --site-dir /tmp/docs
 
       - name: Deploy website
         uses: peaceiris/actions-gh-pages@v3
         with:
           # https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-set-personal-access-token-personal_token
-          
           personal_token: ${{ secrets.GITHUB_TOKEN }}
-          
           publish_dir: /tmp/docs
           publish_branch: gh-pages
           allow_empty_commit: false
