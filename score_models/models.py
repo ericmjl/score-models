@@ -11,6 +11,13 @@ from jax.scipy.stats import norm
 def gaussian_score_func(params: Tuple[float, float], draw: float) -> float:
     """Gaussian score function for 1 draw.
 
+    Example:
+
+        >>> from score_models.models import gaussian_score_func
+        >>> params = (3.0, 1.0)  # true_mu, true_sigma
+        >>> gaussian_score_func(params, 3.0)
+        DeviceArray(-0., dtype=float32)
+
     :param params: Tuple of `mu` and `log_sigma`.
     :param draw: One observed value.
     :returns: Data score (conditioned on `params`).
