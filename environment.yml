@@ -47,3 +47,5 @@ dependencies:
       - mknotebooks
       - jax
       - jaxlib
+      - jaxopt
+      - dm-haiku
