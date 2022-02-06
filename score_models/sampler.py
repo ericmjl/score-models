@@ -17,6 +17,19 @@ def langevin_dynamics(
 ):
     """MCMC with Langevin dynamics to sample from the data generating distribution.
 
+    Example:
+
+        >>> from score_models.sampler import langevin_dynamics
+        >>> chain_samples = langevin_dynamics(
+        ...     n_chains=4000,
+        ...     n_samples=2000,
+        ...     key=key,
+        ...     epsilon=epsilon,
+        ...     score_func=nn_score_func,  # a score function model.
+        ...     params=result.params,      # result of optimization
+        ...     init_scale=5
+        ... )
+
     :param n_chains: Number of chains to run for sampling.
     :param n_samples: Number of samples to generate from each chain.
     :param key: JAX PRNGKey.
