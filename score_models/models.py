@@ -42,7 +42,7 @@ def nn_model() -> Tuple[Callable, Callable]:
     return init_fun, apply_fun
 
 
-def nn_score_func(params, draw: float):
+def nn_score_func(params: tuple, draw: float):
     """Scalar version of the score function.
 
     A hack to get around the shape issues that plague tensor math :).
