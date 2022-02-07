@@ -1,5 +1,5 @@
 """Langevin dynamics samplers."""
-from typing import Callable
+from typing import Callable, Optional
 
 from jax import lax
 from jax import numpy as np
@@ -14,6 +14,7 @@ def langevin_dynamics(
     score_func: Callable,
     params: tuple,
     init_scale: float,
+    starter_xs: Optional[np.ndarray] = None,
 ):
     """MCMC with Langevin dynamics to sample from the data generating distribution.
 
@@ -42,6 +43,8 @@ def langevin_dynamics(
         Can be, for example, parameters to a neural network function.
     :param init_scale: Scale parameter for the Gaussian
         from which chains are initialized.
+    :param starter_xs: Starting values of each chain.
+        Should be of shape (n_chains,).
     :returns: An array of samples of shape (n_chains, n_samples).
     """
 
@@ -55,7 +58,7 @@ def langevin_dynamics(
 
         :param x: One sample from the data generating distribution.
         :param key: JAX PRNGKey.
-        :returns: Samples from one chain of Langevin dynamics sampling.
+        :returns: Final states and samples from one chain of Langevin dynamics sampling.
         """
 
         def inner(prev_x, key):
@@ -74,10 +77,11 @@ def langevin_dynamics(
             return new_x, prev_x
 
         keys = random.split(key, n_samples)
-        _, xs = lax.scan(inner, init=x, xs=keys)
-        return np.concatenate(xs)
+        final_xs, xs = lax.scan(inner, init=x, xs=keys)
+        return final_xs, np.concatenate(xs)
 
-    starter_xs = random.normal(key, shape=(n_chains,)).reshape(-1, 1) * init_scale
+    if starter_xs is None:
+        starter_xs = random.normal(key, shape=(n_chains,)).reshape(-1, 1) * init_scale
     keys = random.split(key, num=n_chains)
-    samples = vmap(langevin_dynamics_one_chain)(starter_xs, keys)
-    return samples
+    final_samples, samples = vmap(langevin_dynamics_one_chain)(starter_xs, keys)
+    return final_samples, samples

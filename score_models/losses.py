@@ -6,7 +6,7 @@ from jax import numpy as np
 from jax import vmap
 
 
-def loss(params, score_func, batch) -> float:
+def score_matching_loss(params, score_func, batch) -> float:
     """Score matching loss function.
 
     :param params: The parameters to the score function.
