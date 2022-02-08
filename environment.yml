@@ -41,6 +41,8 @@ dependencies:
   - mkdocs
   - mkdocs-material
   - mkdocstrings
+  - tqdm
+  - ffmpeg
   # pip dependencies
   - pip:
       # Place packages that cannot be installed by conda in this section.
@@ -49,3 +51,4 @@ dependencies:
       - jaxlib
       - jaxopt
       - dm-haiku
+      - celluloid
