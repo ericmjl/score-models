@@ -1,7 +1,8 @@
 """Langevin dynamics samplers."""
+from functools import partial
 from typing import Callable, Optional
 
-from jax import lax
+from jax import jit, lax
 from jax import numpy as np
 from jax import random, vmap
 
@@ -15,6 +16,7 @@ def langevin_dynamics(
     params: tuple,
     init_scale: float,
     starter_xs: Optional[np.ndarray] = None,
+    sample_shape: Optional[tuple] = None,
 ):
     """MCMC with Langevin dynamics to sample from the data generating distribution.
 
@@ -28,7 +30,8 @@ def langevin_dynamics(
         ...     epsilon=epsilon,
         ...     score_func=nn_score_func,  # a score function model.
         ...     params=result.params,      # result of optimization
-        ...     init_scale=5
+        ...     init_scale=5,
+        ...     sample_shape=(None, 2)
         ... )
 
     :param n_chains: Number of chains to run for sampling.
@@ -44,10 +47,28 @@ def langevin_dynamics(
     :param init_scale: Scale parameter for the Gaussian
         from which chains are initialized.
     :param starter_xs: Starting values of each chain.
-        Should be of shape (n_chains,).
+        Its shape should be similar to the observed data;
+        instead of `(batch, :)`,
+        where `:` refers to arbitrary numbers of dimensions,
+        `starter_xs` should be of shape `(n_chains, :)`.
+    :param sample_shape: The shape of one observation in the chain.
+        Used to initialize the shape of a sample.
     :returns: An array of samples of shape (n_chains, n_samples).
+    :raises ValueError: if `starter_xs` and `sample_shape` are both None
     """
+    # Defensive check on starter_xs and sample_shape
+    if starter_xs is None and sample_shape is None:
+        raise ValueError("`starter_xs` and `sample_shape` cannot both be None!")
 
+    if sample_shape is None:
+        sample_shape = (None, *starter_xs.shape[1:])
+    if starter_xs is None:
+        starter_xs = (
+            random.normal(key, shape=(n_chains, *sample_shape[1:])) * init_scale
+        )
+    score_func = partial(score_func, params)
+
+    @jit
     def langevin_dynamics_one_chain(
         x: float,
         key: random.PRNGKey,
@@ -68,20 +89,14 @@ def langevin_dynamics(
             :param key: JAX PRNGKey.
             :returns: A tuple of a (new_draw, prev_draw) from the sampler.
             """
-            draw = random.normal(key, shape=(1,))
-            new_x = (
-                prev_x
-                + epsilon * score_func(params, prev_x)
-                + np.sqrt(2 * epsilon) * draw
-            )
+            draw = random.normal(key, shape=sample_shape[1:])
+            new_x = prev_x + epsilon * score_func(prev_x) + np.sqrt(2 * epsilon) * draw
             return new_x, prev_x
 
         keys = random.split(key, n_samples)
         final_xs, xs = lax.scan(inner, init=x, xs=keys)
-        return final_xs, np.concatenate(xs)
+        return final_xs, np.vstack(xs)
 
-    if starter_xs is None:
-        starter_xs = random.normal(key, shape=(n_chains,)).reshape(-1, 1) * init_scale
     keys = random.split(key, num=n_chains)
     final_samples, samples = vmap(langevin_dynamics_one_chain)(starter_xs, keys)
-    return final_samples, samples
+    return starter_xs, final_samples, samples
