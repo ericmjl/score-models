@@ -3,7 +3,7 @@ from functools import partial
 from typing import Callable
 
 import numpy as np
-from jax import grad, vmap
+from jax import grad, random, vmap
 
 
 def batchify_and_grad(
@@ -30,3 +30,23 @@ def batchify_and_grad(
         score_func = vmap(score_func)
         dscore_func = vmap(dscore_func)
     return score_func, dscore_func
+
+
+def generate_mixture_2d(key) -> tuple[np.ndarray, random.PRNGKey]:
+    """Generate a mixture 2D gaussian.
+
+    :param key: A JAX PRNGKey.
+    :returns: A 2-tuple of (data, PRNGKey).
+    """
+    k1, k2, k3 = random.split(key, 3)
+
+    mu1 = np.array([0, 0])
+    cov1 = np.eye(2)
+    mix1 = random.multivariate_normal(k1, mean=mu1, cov=cov1, shape=(250,))
+
+    mu2 = np.array([5, -5])
+    cov2 = np.eye(2)
+    mix2 = random.multivariate_normal(k2, mean=mu2, cov=cov2, shape=(250,))
+
+    data = np.concatenate([mix1, mix2])
+    return data, k3
