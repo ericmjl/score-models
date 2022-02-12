@@ -34,7 +34,7 @@ RUN apt-get update \
     && /opt/conda/bin/conda install -c conda-forge -y mamba \
     #
     # Update Python environment based on environment.yml (if present)
-    && if [ -f "/tmp/conda-tmp/environment.yml" ]; then /opt/conda/bin/mamba env update -n base -f /tmp/conda-tmp/environment.yml; fi \
+    && if [ -f "/tmp/conda-tmp/environment.yml" ]; then /opt/conda/bin/mamba env update -n base -f /tmp/conda-tmp/environment.yml && /opt/conda/bin/conda clean -afy; fi \
     && rm -rf /tmp/conda-tmp \
     #
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
