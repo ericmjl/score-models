@@ -5,7 +5,7 @@ dependencies:
   # Core stack
   - python=3.9
   - build
-  - bump2version
+  - bump2version=1.0.1
   - ipykernel
   - ipywidgets
   - jupyter
@@ -15,18 +15,16 @@ dependencies:
   - twine
   # Standard PyData stack
   - matplotlib
-  - numpy
+  - numpy=1.22.2
   - pandas
-  - pymc
-  - scikit-learn
-  - scipy
-  - seaborn
-  - statsmodels
+  - scipy=1.8.0
+  - seaborn=0.11.2
   # Utilities
   - pyprojroot
   - python-dotenv
   # CLI development
-  - typer
+  - typer=0.4.0
+  - typer-cli=0.0.12
   # Software testing
   - hypothesis
   - pytest
@@ -47,7 +45,9 @@ dependencies:
   - pip:
       # Place packages that cannot be installed by conda in this section.
       - mknotebooks
-      - jax
+      # To install GPU versions, execute the following command after updating the environment.
+      # pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+      - jax==0.3.0
       - jaxlib
       - jaxopt
       - dm-haiku
