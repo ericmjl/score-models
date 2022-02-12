@@ -24,7 +24,10 @@ def hello():
 @app.command()
 def describe():
     """Describe the project."""
-    typer.echo("This project's description is Me learning about score models, generating samples, and ODE nets.")
+    typer.echo(
+        "This project's description is me learning about score models, "
+        "generating samples, and ODE nets."
+    )
 
 
 if __name__ == "__main__":
