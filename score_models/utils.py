@@ -38,15 +38,19 @@ def generate_mixture_2d(key) -> tuple[np.ndarray, random.PRNGKey]:
     :param key: A JAX PRNGKey.
     :returns: A 2-tuple of (data, PRNGKey).
     """
-    k1, k2, k3 = random.split(key, 3)
+    k1, k2, k3, k4 = random.split(key, 4)
 
-    mu1 = np.array([0, 0])
+    mu1 = np.array([10, 10])
     cov1 = np.eye(2)
-    mix1 = random.multivariate_normal(k1, mean=mu1, cov=cov1, shape=(250,))
+    mix1 = random.multivariate_normal(k1, mean=mu1, cov=cov1, shape=(100,))
 
-    mu2 = np.array([5, -5])
+    mu2 = np.array([-10, -10])
     cov2 = np.eye(2)
-    mix2 = random.multivariate_normal(k2, mean=mu2, cov=cov2, shape=(250,))
+    mix2 = random.multivariate_normal(k2, mean=mu2, cov=cov2, shape=(100,))
 
-    data = np.concatenate([mix1, mix2])
-    return data, k3
+    mu3 = np.array([-10, 10])
+    cov3 = np.eye(2)
+    mix3 = random.multivariate_normal(k3, mean=mu3, cov=cov3, shape=(100,))
+
+    data = np.concatenate([mix1, mix2, mix3])
+    return data, k4
