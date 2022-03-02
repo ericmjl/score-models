@@ -18,6 +18,7 @@ dependencies:
   - numpy=1.22.2
   - pandas
   - scipy=1.8.0
+  - cudatoolkit=11.6
   - seaborn=0.11.2
   # Utilities
   - pyprojroot
