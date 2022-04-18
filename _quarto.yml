@@ -1,0 +1,21 @@
+project:
+  title: "score-models"
+  type: book
+  output-dir: _site
+
+book:
+  title: "A Pedagogical Introduction to Score Models"
+  author: Eric J. Ma
+  chapters:
+    - "index.md"
+    - "notebooks/01-score-function.ipynb"
+
+# https://quarto.org/docs/books/
+format:
+  html:
+    theme: cosmo
+
+  # site-url: https://ericmjl.github.io/score-models
+  # repo-url: https://github.com/ericmjl/score-models
+  # navbar:
+  #   search: true
