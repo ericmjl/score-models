@@ -50,7 +50,7 @@ def nn_model(output_dim: int = 1) -> Tuple[Callable, Callable]:
     :returns: (init_fun, apply_fun) pair.
     """
     init_fun, apply_fun = stax.serial(
-        stax.Dense(8192),
+        stax.Dense(2048),
         stax.Relu,
         stax.Dense(output_dim),
     )
