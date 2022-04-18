@@ -148,3 +148,6 @@ cython_debug/
 oryx-build-commands.txt
 .DS_Store
 *.mp4
+
+/.quarto/
+_site/
