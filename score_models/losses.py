@@ -1,8 +1,7 @@
 """Implementation of loss function for score matching."""
-from functools import partial
 from typing import Callable
 
-from jax import jacfwd
+from jax import jacfwd, jit
 from jax import numpy as np
 from jax import vmap
 from jax.tree_util import tree_flatten, tree_map
@@ -31,21 +30,21 @@ def l2_norm(params) -> float:
     return np.sum(np.array(flattened))
 
 
-def score_matching_loss(params, score_func: Callable, batch: np.ndarray) -> float:
+@jit
+def score_matching_loss(model_func: Callable, batch: np.ndarray) -> float:
     """Score matching loss function.
 
     This is taken from (Hyvärinen, 2005) (JMLR)
     and https://yang-song.github.io/blog/2019/ssm/.
 
     :param params: The parameters to the score function.
-    :param score_func: Score function with signature `func(params, batch)`,
+    :param model_func: Model function with signature `func(params, batch)`,
         which returns a scalar.
     :param batch: A batch of data. Should be of shape (batch, :),
         where `:` refers to at least 1 more dimension.
     :returns: Score matching loss, a float.
     """
-    score_func = partial(score_func, params)
-    dscore_func = jacfwd(score_func)
+    dmodel_func = jacfwd(model_func)
 
     # Jacobian of score function (i.e. dlogp estimator function).
     # In the literature, this is also called the Hessian of the logp.
@@ -54,11 +53,11 @@ def score_matching_loss(params, score_func: Callable, batch: np.ndarray) -> floa
     # where `i` is the number of dimensions of the input data,
     # or the number of random variables.
     # Here, we want the diagonals instead, which is of shape (i,)
-    term1 = vmap(dscore_func)(batch)
+    term1 = vmap(dmodel_func)(batch)
     term1 = vmap(np.diagonal)(term1)
 
     # Discretized integral of score function.
-    term2 = 0.5 * vmap(score_func)(batch) ** 2
+    term2 = 0.5 * vmap(model_func)(batch) ** 2
     term2 = np.reshape(term2, term1.shape)
 
     # Summation over the inner term, by commutative property of addition,
@@ -69,4 +68,4 @@ def score_matching_loss(params, score_func: Callable, batch: np.ndarray) -> floa
     # while Hyvärinen's JMLR paper uses an explicit summation in Equation 4.
     inner_term = term1 + term2
     summed_by_dims = vmap(np.sum)(inner_term)
-    return np.mean(summed_by_dims) + 0.1 * l2_norm(params)
+    return np.mean(summed_by_dims)
