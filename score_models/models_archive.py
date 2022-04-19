@@ -3,20 +3,21 @@ from typing import Callable, Tuple
 
 import jax.numpy as np
 from jax import jacfwd, random
-from jax.example_libraries import stax
 from jax.scipy.stats import norm
 
 
 def gaussian_model() -> Tuple[Callable, Callable]:
-    """Gaussian model.
+    """Gaussian model in stax form.
 
     :returns: An (init_fun, apply_fun) pair.
     """
 
-    def init_fun(key: random.PRNGKey, **kwargs):
+    def init_fun(key: random.PRNGKey, *args, **kwargs):
         """Initialization function.
 
         :param key: JAX PRNGKey.
+        :param args: Unused by the function.
+            Just present to make function match API of stax.
         :param kwargs: Unused by the function.
             Just present to make function match API of stax.
         :returns: A tuple of (None, [mu, log_sigma]).
@@ -35,23 +36,4 @@ def gaussian_model() -> Tuple[Callable, Callable]:
         mu, log_sigma = params
         return gaussian_score_func(x, loc=mu, scale=np.exp(log_sigma)).squeeze()
 
-    return init_fun, apply_fun
-
-
-def nn_model(output_dim: int = 1) -> Tuple[Callable, Callable]:
-    """Simple neural network model for predicting score from.
-
-    Example:
-
-        >>> from score_models.models import nn_score_func
-        >>> init_fun, apply_fun = nn_score_func()
-
-    :param output_dim: Number of dimensions for the model to output.
-    :returns: (init_fun, apply_fun) pair.
-    """
-    init_fun, apply_fun = stax.serial(
-        stax.Dense(2048),
-        stax.Relu,
-        stax.Dense(output_dim),
-    )
     return init_fun, apply_fun
