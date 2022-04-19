@@ -1,7 +1,8 @@
 """Implementation of loss function for score matching."""
 from typing import Callable
 
-from jax import jacfwd, jit
+import equinox as eqx
+from jax import jacfwd
 from jax import numpy as np
 from jax import vmap
 from jax.tree_util import tree_flatten, tree_map
@@ -30,7 +31,7 @@ def l2_norm(params) -> float:
     return np.sum(np.array(flattened))
 
 
-@jit
+@eqx.filter_jit
 def score_matching_loss(model_func: Callable, batch: np.ndarray) -> float:
     """Score matching loss function.
 
