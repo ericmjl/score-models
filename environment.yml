@@ -15,17 +15,17 @@ dependencies:
   - twine
   # Standard PyData stack
   - matplotlib
-  - numpy=1.22.2
+  - numpy
   - pandas
-  - scipy=1.8.0
-  - cudatoolkit=11.6
-  - seaborn=0.11.2
+  - scipy
+  - cudatoolkit
+  - seaborn
   # Utilities
   - pyprojroot
   - python-dotenv
   # CLI development
-  - typer=0.4.0
-  - typer-cli=0.0.12
+  - typer
+  - typer-cli
   # Software testing
   - hypothesis
   - pytest
@@ -37,9 +37,6 @@ dependencies:
   - pre-commit
   - pylint
   # Documentation
-  - mkdocs
-  - mkdocs-material
-  - mkdocstrings
   - tqdm
   - ffmpeg
   # pip dependencies
@@ -48,8 +45,12 @@ dependencies:
       - mknotebooks
       # To install GPU versions, execute the following command after updating the environment.
       # pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
-      - jax==0.3.0
+      - jax
       - jaxlib
       - jaxopt
+      - equinox
       - dm-haiku
       - celluloid
+      - elegy
+      # Pin minimum chex version once it is released.
+      - git+https://github.com/deepmind/chex.git # https://github.com/deepmind/optax/issues/335
