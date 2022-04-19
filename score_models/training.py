@@ -8,6 +8,17 @@ from jax import value_and_grad
 from tqdm.auto import tqdm
 
 
+def default_optimizer():
+    return optax.chain(
+        optax.clip(0.01),
+        optax.sgd(learning_rate=5e-2),
+    )
+
+
+def adam_optimizer():
+    return optax.adam(learning_rate=5e-2)
+
+
 def fit(
     model: eqx.Module,
     data: np.ndarray,
@@ -25,7 +36,7 @@ def fit(
     :returns: A tuple of updated model + training loss history.
     """
     opt_state = optimizer.init(model)
-    dloss = eqx.filter_jit(value_and_grad(loss))
+    dloss = eqx.filter_jit(eqx.filter_value_and_grad(loss))
 
     @eqx.filter_jit
     def step(model, data, opt_state):
