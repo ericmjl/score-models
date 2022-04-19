@@ -29,6 +29,7 @@ dependencies:
   # Software testing
   - hypothesis
   - pytest
+  - pytest-cov
   # Code Style Tools
   - black
   - darglint
