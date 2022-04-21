@@ -6,9 +6,13 @@ project:
 book:
   title: "A Pedagogical Introduction to Score Models"
   author: Eric J. Ma
+  date: "2022-04-21"
   chapters:
     - "index.md"
     - "notebooks/01-score-function.ipynb"
+  page-footer: "Copyright 2022-, Eric J. Ma"
+
+bibliography: references.bib
 
 # https://quarto.org/docs/books/
 format:
