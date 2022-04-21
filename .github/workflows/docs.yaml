@@ -19,6 +19,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/install-quarto@v1
+        with:
+          # To install LaTeX to build PDF book
+          tinytex: true
+          # uncomment below and fill to pin a version
+          # version: 0.9.105
+
       # See: https://github.com/marketplace/actions/setup-miniconda
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v2
@@ -35,7 +43,6 @@ jobs:
           conda activate score-models
           python -m ipykernel install --user --name score-models
           pip install -e .
-          typer score_models.cli utils docs --name score-models --output docs/cli.md
           mkdocs build --site-dir /tmp/docs
 
       - name: Deploy website
