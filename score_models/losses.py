@@ -7,7 +7,7 @@ from jax import vmap
 from jax.tree_util import tree_flatten, tree_map
 
 
-def l2_norm(model: eqx.Module) -> float:
+def l2_norm(model: eqx.Module, batch: np.ndarray, scale: float = 0.1) -> float:
     """Return the sum of square of weights.
 
     Allows for L2 norm-based regularization of weight parameter.
@@ -21,16 +21,18 @@ def l2_norm(model: eqx.Module) -> float:
     DeviceArray(2.0399997, dtype=float32)
 
     :param model: An Equinox Module.
+    :param batch: Present only for compatibility with the rest of the loss functions.
+    :param scale: The scale of L2 regularization to apply. Defaults to 0.1
     :returns: L2 norm.
     """
     # Test: tree-map np.sum to get weight regularization term
+    model = eqx.filter(model, eqx.is_array_like)
     squared = tree_map(lambda x: np.power(x, 2), model)
     summed = tree_map(np.sum, squared)
     flattened, _ = tree_flatten(summed)
-    return np.sum(np.array(flattened))
+    return np.sum(np.array(flattened)) * scale
 
 
-@eqx.filter_jit
 def score_matching_loss(model: eqx.Module, batch: np.ndarray) -> float:
     """Score matching loss function.
 
@@ -50,7 +52,7 @@ def score_matching_loss(model: eqx.Module, batch: np.ndarray) -> float:
     # The Jacobian shape is: `(i, i)`,
     # where `i` is the number of dimensions of the input data,
     # or the number of random variables.
-    # Here, we want the diagonals instead, which is of shape (i,)
+    # Here, we want the diagonals instead, which when extracted out, is of shape (i,)
     term1 = vmap(dmodel)(batch)
     term1 = vmap(np.diagonal)(term1)
 
@@ -67,3 +69,30 @@ def score_matching_loss(model: eqx.Module, batch: np.ndarray) -> float:
     inner_term = term1 + term2
     summed_by_dims = vmap(np.sum)(inner_term)
     return np.mean(summed_by_dims)
+
+
+def chain(*loss_funcs):
+    """Chain loss functions together.
+
+    All loss funcs must have the signature loss(model, batch).
+
+    :param loss_funcs: Loss functions to chain together.
+    :returns: A closure.
+    """
+
+    def chained(model, batch):
+        """Chained loss function.
+
+        This loss simply adds up the losses computed by
+        the loss functions defined in the outer function.
+
+        :param model: Equinox model.
+        :param batch: A batch of data.
+        :returns: Total loss across all loss functions.
+        """
+        loss_score = 0
+        for loss in loss_funcs:
+            loss_score += loss(model, batch)
+        return loss_score
+
+    return chained

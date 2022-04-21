@@ -4,19 +4,7 @@ from typing import Callable, List, Tuple
 import equinox as eqx
 import optax
 from jax import numpy as np
-from jax import value_and_grad
 from tqdm.auto import tqdm
-
-
-def default_optimizer():
-    return optax.chain(
-        optax.clip(0.01),
-        optax.sgd(learning_rate=5e-2),
-    )
-
-
-def adam_optimizer():
-    return optax.adam(learning_rate=5e-2)
 
 
 def fit(
@@ -25,6 +13,7 @@ def fit(
     loss: Callable,
     optimizer: optax.GradientTransformation,
     steps: int = 1_000,
+    progress_bar: bool = True,
 ) -> Tuple[eqx.Module, List]:
     """Fit model to data.
 
@@ -33,9 +22,11 @@ def fit(
     :param loss: Loss function.
     :param optimizer: The optimizer to use.
     :param steps: Number of steps to train for.
+    :param progress_bar: Whether or not to show a progress bar.
+        Defaults to True.
     :returns: A tuple of updated model + training loss history.
     """
-    opt_state = optimizer.init(model)
+    opt_state = optimizer.init(eqx.filter(model, eqx.is_array))
     dloss = eqx.filter_jit(eqx.filter_value_and_grad(loss))
 
     @eqx.filter_jit
@@ -55,7 +46,10 @@ def fit(
         return model, opt_state, loss_score
 
     loss_history = []
-    for _ in tqdm(range(steps)):
+    iterator = range(steps)
+    if progress_bar:
+        iterator = tqdm(iterator)
+    for _ in iterator:
         model, opt_state, loss_score = step(model, data, opt_state)
         loss_history.append(loss_score)
     return model, loss_history
