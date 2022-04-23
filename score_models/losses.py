@@ -54,6 +54,8 @@ def score_matching_loss(model: eqx.Module, batch: np.ndarray) -> float:
     # or the number of random variables.
     # Here, we want the diagonals instead, which when extracted out, is of shape (i,)
     term1 = vmap(dmodel)(batch)
+    if len(term1.shape) == 2 and term1.shape[-1] == 1:
+        term1 = np.expand_dims(term1, -1)
     term1 = vmap(np.diagonal)(term1)
 
     # Discretized integral of score function.
