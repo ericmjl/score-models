@@ -1,10 +1,45 @@
 """Langevin dynamics samplers."""
-from functools import partial
-from typing import Callable, Optional
+from typing import Optional
 
+import equinox as eqx
 from jax import jit, lax
 from jax import numpy as np
 from jax import random, vmap
+
+
+class LangevinDynamicsChain(eqx.Module):
+    """Langevin dynamics chain."""
+
+    gradient_func: eqx.Module
+    n_samples: int = 1000
+    epsilon: float = 5e-3
+
+    @eqx.filter_jit
+    def __call__(self, x, key: random.PRNGKey):
+        """Callable implementation for sampling.
+
+        :param x: Data of shape (batch, :).
+        :param key: PRNGKey for random draws.
+        :returns: A tuple of final draw and historical draws."""
+
+        def langevin_step(prev_x, key):
+            """Scannable langevin dynamics step.
+
+            :param prev_x: Previous value of x in langevin dynamics step.
+            :param key: PRNGKey for random draws.
+            :returns: A tuple of new x and previous x.
+            """
+            draw = random.normal(key, shape=x.shape)
+            new_x = (
+                prev_x
+                + self.epsilon * vmap(self.gradient_func)(prev_x)
+                + np.sqrt(2 * self.epsilon) * draw
+            )
+            return new_x, prev_x
+
+        keys = random.split(key, self.n_samples)
+        final_xs, xs = lax.scan(langevin_step, init=x, xs=keys)
+        return final_xs, np.vstack(xs)
 
 
 def langevin_dynamics(
@@ -12,8 +47,7 @@ def langevin_dynamics(
     n_samples: int,
     key: random.PRNGKey,
     epsilon: float,
-    score_func: Callable,
-    params: tuple,
+    score_func: eqx.Module,
     init_scale: float,
     starter_xs: Optional[np.ndarray] = None,
     sample_shape: Optional[tuple] = None,
@@ -28,8 +62,7 @@ def langevin_dynamics(
         ...     n_samples=2000,
         ...     key=key,
         ...     epsilon=epsilon,
-        ...     score_func=nn_score_func,  # a score function model.
-        ...     params=result.params,      # result of optimization
+        ...     score_func=nn_score_func,  # an eqx.Module score function model.
         ...     init_scale=5,
         ...     sample_shape=(None, 2)
         ... )
@@ -40,10 +73,8 @@ def langevin_dynamics(
     :param epsilon: A small number.
         A sane default probably is on the order of
         1/1000th of the magnitude of the data.
-    :param score_func: Callable that gives the score function of the data.
+    :param score_func: An Equinox module that gives the score function of the data.
         Can be, for example, a neural network function.
-    :param params: Parameters to the score function.
-        Can be, for example, parameters to a neural network function.
     :param init_scale: Scale parameter for the Gaussian
         from which chains are initialized.
     :param starter_xs: Starting values of each chain.
@@ -66,7 +97,6 @@ def langevin_dynamics(
         starter_xs = (
             random.normal(key, shape=(n_chains, *sample_shape[1:])) * init_scale
         )
-    score_func = partial(score_func, params)
 
     @jit
     def langevin_dynamics_one_chain(
