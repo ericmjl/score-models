@@ -10,7 +10,8 @@ book:
   chapters:
     - "index.md"
     - "notebooks/01-score-function.ipynb"
-  page-footer: "Copyright 2022-, Eric J. Ma"
+    - "notebooks/02-langevin-dynamics.ipynb"
+  page-footer: "Copyright 2022-present, Eric J. Ma"
 
 bibliography: references.bib
 
@@ -18,8 +19,7 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
-
-  # site-url: https://ericmjl.github.io/score-models
-  # repo-url: https://github.com/ericmjl/score-models
-  # navbar:
-  #   search: true
+# site-url: https://ericmjl.github.io/score-models
+# repo-url: https://github.com/ericmjl/score-models
+# navbar:
+#   search: true
