@@ -1,11 +1,9 @@
 """Feed Forward Neural Network Models."""
 import equinox as eqx
-from jax import nn
-from jax import numpy as np
-from jax import random
+from jax import nn, random
 
 
-class FeedForwardModel(eqx.Module):
+class FeedForwardModel1D(eqx.Module):
     """Feed-forward NN model."""
 
     mlp: eqx.Module
@@ -30,4 +28,4 @@ class FeedForwardModel(eqx.Module):
             as the model is intended to be vmapped over batches of data.
         :returns: Estimated score of a Gaussian.
         """
-        return np.expand_dims(self.mlp(x), -1)
+        return self.mlp(x)
