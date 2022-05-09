@@ -11,6 +11,7 @@ book:
     - "index.md"
     - "notebooks/01-score-function.ipynb"
     - "notebooks/02-langevin-dynamics.ipynb"
+    - "notebooks/03-noise-scales.ipynb"
   page-footer: "Copyright 2022-present, Eric J. Ma"
 
 bibliography: references.bib
