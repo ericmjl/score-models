@@ -49,7 +49,7 @@ dependencies:
       - jax
       - jaxlib
       - jaxopt
-      - equinox
+      - git+git+https://github.com/patrick-kidger/equinox.git@0c21766e46a097581e1c8652895b75bdc78cfdde
       - dm-haiku
       - celluloid
       - elegy

@@ -9,7 +9,13 @@ class FeedForwardModel1D(eqx.Module):
     mlp: eqx.Module
 
     def __init__(
-        self, in_size=1, out_size=1, width_size=4096, depth=1, activation=nn.relu
+        self,
+        in_size=1,
+        out_size=1,
+        width_size=4096,
+        depth=1,
+        activation=nn.relu,
+        key=random.PRNGKey(45),
     ):
         self.mlp = eqx.nn.MLP(
             in_size=in_size,
@@ -17,7 +23,7 @@ class FeedForwardModel1D(eqx.Module):
             width_size=width_size,
             depth=depth,
             activation=activation,
-            key=random.PRNGKey(45),
+            key=key,
         )
 
     @eqx.filter_jit

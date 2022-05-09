@@ -151,3 +151,4 @@ oryx-build-commands.txt
 
 /.quarto/
 _site/
+artifacts
