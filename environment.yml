@@ -49,9 +49,8 @@ dependencies:
       - jax
       - jaxlib
       - jaxopt
-      - git+git+https://github.com/patrick-kidger/equinox.git@0c21766e46a097581e1c8652895b75bdc78cfdde
+      - equinox
       - dm-haiku
       - celluloid
       - elegy
-      # Pin minimum chex version once it is released.
-      - git+https://github.com/deepmind/chex.git # https://github.com/deepmind/optax/issues/335
+      - chex>=0.1.3
