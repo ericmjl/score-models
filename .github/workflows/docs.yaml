@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-docs:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     name: Build documentation
 
     # https://github.com/marketplace/actions/setup-miniconda#use-a-default-shell
