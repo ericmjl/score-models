@@ -52,5 +52,5 @@ dependencies:
       - equinox
       - dm-haiku
       - celluloid
-      - elegy
+      - diffrax
       - chex>=0.1.3
