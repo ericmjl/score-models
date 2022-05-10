@@ -43,7 +43,8 @@ jobs:
           conda activate score-models
           python -m ipykernel install --user --name score-models
           pip install -e .
-          quarto render
+          pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+          quarto render --execute
 
       - name: Deploy website
         uses: peaceiris/actions-gh-pages@v3
