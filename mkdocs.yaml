@@ -59,11 +59,10 @@ extra:
   social:
     - icon: "fontawesome/brands/github"
       link: "https://github.com/ericmjl"
-    
+
     - icon: "fontawesome/brands/twitter"
       link: "https://twitter.com/ericmjl"
-    
-    
+
+
     - icon: "fontawesome/brands/linkedin"
       link: "https://linkedin.com/in/ericmjl"
-    
