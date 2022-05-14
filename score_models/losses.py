@@ -110,6 +110,7 @@ def joint_score_matching_loss(
         Leading axis should be of length n_noise_scales,
         or in an SDE case, the number of time steps.
     :param scales: A NumPy array of scales.
+        In the SDE case, this would be an array of diffusion values.
     :returns: A float.
     """
     loss = 0
