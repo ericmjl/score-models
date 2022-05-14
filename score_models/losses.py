@@ -98,3 +98,21 @@ def chain(*loss_funcs):
         return loss_score
 
     return chained
+
+
+def joint_score_matching_loss(
+    models: list[eqx.Module], datas: np.ndarray, scales: np.ndarray
+) -> float:
+    """Joint score matching loss.
+
+    :param models: A list of Equinox models.
+    :param datas: A collection of noised up data.
+        Leading axis should be of length n_noise_scales,
+        or in an SDE case, the number of time steps.
+    :param scales: A NumPy array of scales.
+    :returns: A float.
+    """
+    loss = 0
+    for model, data, scale in zip(models, datas, scales):
+        loss = loss + score_matching_loss(model, data) * scale
+    return loss
