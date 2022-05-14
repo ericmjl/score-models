@@ -26,6 +26,41 @@ class GaussianModel(eqx.Module):
         return gaussian_score_func(x, loc=self.mu, scale=np.exp(self.log_sigma))
 
 
+class SDEGaussianModel(eqx.Module):
+    r"""Time-dependent Gaussian score function.
+
+    Key trick here is to make the parameters $\mu$ and $\log(\sigma)$ depend on $t$,
+    i.e. the time at which a Gaussian was sampled.
+    """
+
+    mu_w: np.array = np.array(0.0)
+    mu_b: np.array = np.array(0.0)
+    log_sigma_w: np.array = np.array(0.0)
+    log_sigma_b: np.array = np.array(0.0)
+
+    @eqx.filter_jit
+    def __call__(self, x, t):
+        """Forward pass.
+
+        :param x: Data. Should be of shape (1, :),
+            as the model is intended to be vmapped over batches of data.
+        :param t: Time step at which evaluation is happening.
+        :returns: Score of a Gaussian conditioned on a `mu` and `log_sigma`.
+        """
+        gaussian_score_func = jacfwd(norm.logpdf)
+        mu = self.mu_w * t + self.mu_b
+        log_sigma = self.log_sigma_w * t + self.log_sigma_b
+        return gaussian_score_func(x, loc=mu, scale=np.exp(log_sigma))
+
+    # @property
+    # def mu(self, t):
+    #     return self.mu_w * t + self.mu_b
+
+    # @property
+    # def log_sigma(self, t):
+    #     return self.log_sigma_w * t + self.log_sigma_b
+
+
 class MixtureGaussian(eqx.Module):
     """Mixture Gaussian score function."""
 
