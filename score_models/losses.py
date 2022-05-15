@@ -117,23 +117,3 @@ def joint_score_matching_loss(
     for model, data, scale in zip(models, datas, scales):
         loss = loss + score_matching_loss(model, data) * scale
     return loss
-
-
-def sde_joint_score_matching_loss(
-    models: list[eqx.Module], datas: np.ndarray, scales: np.ndarray, ts: np.ndarray
-) -> float:
-    """Joint score matching loss.
-
-    :param models: A list of Equinox models.
-    :param datas: A collection of noised up data.
-        Leading axis should be of length n_noise_scales,
-        or in an SDE case, the number of time steps.
-    :param scales: A NumPy array of scales.
-        In the SDE case, this would be an array of diffusion values.
-    :param ts: Timepoints at which loss is being evaluated.
-    :returns: A float.
-    """
-    loss = 0
-    for model, data, scale, t in zip(models, datas, scales, ts):
-        loss = loss + score_matching_loss(model, data, t) * scale
-    return loss
