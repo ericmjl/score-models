@@ -12,7 +12,7 @@ book:
     - "notebooks/01-score-function.ipynb"
     - "notebooks/02-langevin-dynamics.ipynb"
     - "notebooks/03-noise-scales.ipynb"
-    - "notebooks/04-sde.ipynb"
+    - "notebooks/04-diffeq.ipynb"
   page-footer: "Copyright 2022-present, Eric J. Ma"
 
 bibliography: references.bib
