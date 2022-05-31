@@ -19,6 +19,7 @@ class GaussianModel(eqx.Module):
         """Forward pass.
 
         :param x: Data. Should be of shape (1, :),
+            where `1` is in the batch dimension slot.
             as the model is intended to be vmapped over batches of data.
         :returns: Score of a Gaussian conditioned on a `mu` and `log_sigma`.
         """
@@ -50,6 +51,7 @@ class MixtureGaussian(eqx.Module):
         """Forward pass.
 
         :param x: Data. Should be of shape (1, :),
+            where `1` is in the batch dimension slot.
             as the model is intended to be vmapped over batches of data.
         :returns: Score of a Gaussian conditioned on a `mu` and `log_sigma`.
         """
