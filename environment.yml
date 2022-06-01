@@ -20,6 +20,7 @@ dependencies:
   - scipy
   - cudatoolkit
   - seaborn
+  - cloudpickle
   # Utilities
   - pyprojroot
   - python-dotenv
