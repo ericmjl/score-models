@@ -9,6 +9,7 @@ jobs:
   build-docs:
     runs-on: ubuntu-latest
     name: Build documentation
+    timeout-minutes: 600
 
     # https://github.com/marketplace/actions/setup-miniconda#use-a-default-shell
     defaults:
@@ -43,7 +44,7 @@ jobs:
           conda activate score-models
           python -m ipykernel install --user --name score-models
           pip install -e .
-          quarto render
+          quarto render --execute
 
       - name: Deploy website
         uses: peaceiris/actions-gh-pages@v3
