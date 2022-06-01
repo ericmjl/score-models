@@ -9,6 +9,7 @@ jobs:
   build-docs:
     runs-on: ubuntu-latest
     name: Build documentation
+    timeout-minutes: 600
 
     # https://github.com/marketplace/actions/setup-miniconda#use-a-default-shell
     defaults:
