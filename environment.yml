@@ -55,3 +55,4 @@ dependencies:
       - celluloid
       - diffrax
       - chex>=0.1.3
+      - seqlike
