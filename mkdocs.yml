@@ -1,0 +1,45 @@
+site_name: score_models
+
+docs_dir: docs/
+
+theme:
+  name: "material"
+  palette:
+    primary: "indigo"
+    accent: "indigo"
+  icon:
+    logo: "fontawesome/solid/book"
+  features:
+    - instant
+    - tabs
+  language: en
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            docstring_style: restructured-text
+
+  - mknotebooks:
+      execute: true
+      write_markdown: true
+      allow_errors: true
+      timeout: 1200
+      binder: false
+
+# Taken from here: https://squidfunk.github.io/mkdocs-material/extensions/codehilite/
+markdown_extensions:
+  - admonition
+  - pymdownx.arithmatex
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+
+extra_css:
+  - css/apidocs.css
+
+# TODO: Uncomment and set values to correct ones as appropriate.
+repo_name: "modernatx/score_models"
+repo_url: "https://bitbucket.org/modernatx/score_models"

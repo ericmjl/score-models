@@ -1,33 +1,15 @@
-"""Custom CLI for your score-models.
-
-This is totally optional;
-if you want to use it, though,
-follow the skeleton to flesh out the CLI to your liking!
-Finally, familiarize yourself with Typer,
-which is the package that we use to enable this magic.
-Typer's docs can be found at:
-
-    https://typer.tiangolo.com
-"""
-
+"""CLI for score_models."""
 import typer
+
+from score_models.example import hello_world
 
 app = typer.Typer()
 
 
 @app.command()
 def hello():
-    """Echo the project's name."""
-    typer.echo("This project's name is score-models")
-
-
-@app.command()
-def describe():
-    """Describe the project."""
-    typer.echo(
-        "This project's description is me learning about score models, "
-        "generating samples, and ODE nets."
-    )
+    """Hello command"""
+    typer.echo(hello_world())
 
 
 if __name__ == "__main__":

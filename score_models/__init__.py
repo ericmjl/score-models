@@ -1,8 +1,22 @@
-"""Top-level API for score-models.
+"""Top-level API for score_models.
 
-This is the file from which you can do:
+Welcome to your custom source package!
+Place your code inside custom Python modules (i.e. `.py` files)
+housed under `score_models/some_module.py`.
+You can import them into this file
+and expose them as your project's top-level API:
 
-    from score-models import some_function
+    from .some_module import some_function
 
-Use it to control the top-level API of your Python data science project.
+Now you'll be able to run the following import from your Jupyter notebooks:
+
+    from score_models import some_function
+
+For more information on how to structure a Python package,
+please see the official Python packaging docs:
+
+    https://packaging.python.org/tutorials/packaging-projects/
+
+Feel free to delete everything after the first line of this docstring
+once you are familiar with how packaging works.
 """
