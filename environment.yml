@@ -21,6 +21,7 @@ dependencies:
   - cudatoolkit
   - seaborn
   - cloudpickle
+  - scikit-learn
   # Utilities
   - pyprojroot
   - python-dotenv
