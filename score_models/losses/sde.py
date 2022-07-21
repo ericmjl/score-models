@@ -22,7 +22,8 @@ def score_matching_loss(
     model = partial(model, t=t)
     dmodel = jacfwd(model, argnums=0)
     term1 = vmap(dmodel)(noised_data)
-    term1 = vmap(np.diagonal)(term1)
+    if term1.ndim > 1:
+        term1 = vmap(np.diagonal)(term1)
     term2 = 0.5 * vmap(model)(noised_data) ** 2
     inner_term = term1 + term2
     summed_by_dims = vmap(np.sum)(inner_term)
