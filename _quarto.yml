@@ -13,6 +13,7 @@ book:
     - "notebooks/02-langevin-dynamics.ipynb"
     - "notebooks/03-noise-scales.ipynb"
     - "notebooks/04-diffeq.ipynb"
+    - "notebooks/05-generalizing-2d.ipynb"
   page-footer: "Copyright 2022-present, Eric J. Ma"
 
 bibliography: references.bib
