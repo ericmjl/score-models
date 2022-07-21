@@ -1,6 +1,7 @@
 """Top-level API for losses."""
-from .diffusion import joint_score_matching_loss
+from .diffusion import joint_score_matching_loss, score_matching_loss
 from .sde import joint_score_matching_loss as joint_sde_score_matching_loss
+from .sde import score_matching_loss as sde_score_matching_loss
 from .utils import chain, l2_norm
 
 __all__ = [
@@ -8,4 +9,6 @@ __all__ = [
     "joint_score_matching_loss",
     "joint_sde_score_matching_loss",
     "l2_norm",
+    "score_matching_loss",
+    "sde_score_matching_loss",
 ]

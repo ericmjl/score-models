@@ -152,3 +152,6 @@ oryx-build-commands.txt
 /.quarto/
 _site/
 artifacts
+site_libs
+docs/*.html
+index.html
