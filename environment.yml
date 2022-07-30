@@ -1,6 +1,7 @@
 name: score-models
 channels:
   - conda-forge
+  - bioconda
 dependencies:
   # Core stack
   - python=3.9
@@ -18,13 +19,16 @@ dependencies:
   - numpy
   - pandas
   - scipy
-  - cudatoolkit
+  - cudatoolkit=11.6
   - seaborn
   - cloudpickle
   - scikit-learn
   # Utilities
   - pyprojroot
   - python-dotenv
+  - seqlike=1.1.7
+  - mafft
+  - umap-learn
   # CLI development
   - typer
   - typer-cli
@@ -49,7 +53,7 @@ dependencies:
       - mknotebooks
       # To install GPU versions, execute the following command after updating the environment.
       # pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
-      - jax
+      - jax==0.3.15
       - jaxlib
       - optax
       - equinox
@@ -58,3 +62,4 @@ dependencies:
       - diffrax
       - chex>=0.1.3
       - shutup==0.2.0
+      - wget==3.2 # for downloading FASTA files programmatically.

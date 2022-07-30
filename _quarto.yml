@@ -22,6 +22,8 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
+execute:
+  cache: true
 # site-url: https://ericmjl.github.io/score-models
 # repo-url: https://github.com/ericmjl/score-models
 # navbar:
