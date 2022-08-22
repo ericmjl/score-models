@@ -6,8 +6,6 @@ import equinox as eqx
 import jax.numpy as np
 from jax import jacfwd, vmap
 
-from .utils import l2_norm
-
 
 def score_matching_loss(
     model: Union[eqx.Module, Callable], noised_data: np.ndarray, t: float
@@ -45,5 +43,4 @@ def joint_score_matching_loss(
     for noise_batch, t in zip(noised_data_all, ts):
         scale = t
         loss_score += score_matching_loss(model, noise_batch, t) * scale
-        loss_score += l2_norm(model, noise_batch)
     return loss_score
