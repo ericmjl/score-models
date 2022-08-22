@@ -1,10 +1,14 @@
 """Utility loss functions."""
+from typing import Callable, Union
+
 import equinox as eqx
 import jax.numpy as np
 from jax.tree_util import tree_flatten, tree_map
 
 
-def l2_norm(model: eqx.Module, batch: np.ndarray, scale: float = 0.1) -> float:
+def l2_norm(
+    model: Union[eqx.Module, Callable], batch: np.ndarray, scale: float = 0.1
+) -> float:
     """Return the sum of square of weights.
 
     Allows for L2 norm-based regularization of weight parameter.
