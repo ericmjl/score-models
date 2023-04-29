@@ -53,7 +53,7 @@ dependencies:
       - mknotebooks
       # To install GPU versions, execute the following command after updating the environment.
       # pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
-      - jax==0.3.15
+      - jax==0.4.8
       - jaxlib
       - optax
       - equinox
