@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>A Pedagogical Introduction to Score Models - 2&nbsp; Score Functions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/02-langevin-dynamics.html" rel="next">
+<link href="../index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01-score-function.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Score Functions</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">A Pedagogical Introduction to Score Models</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Pedagogical Introduction to Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01-score-function.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Score Functions</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02-langevin-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Langevin Dynamics</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03-noise-scales.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Noise Scales</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/04-diffeq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Differential Equations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/05-generalizing-2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalizing to Higher Dimensions</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#definitions" id="toc-definitions" class="nav-link active" data-scroll-target="#definitions"><span class="header-section-number">2.1</span> Definitions</a>
+  <ul class="collapse">
+  <li><a href="#probability-distributions" id="toc-probability-distributions" class="nav-link" data-scroll-target="#probability-distributions"><span class="header-section-number">2.1.1</span> Probability Distributions</a></li>
+  <li><a href="#px-a.k.a.-probability-density-function" id="toc-px-a.k.a.-probability-density-function" class="nav-link" data-scroll-target="#px-a.k.a.-probability-density-function"><span class="header-section-number">2.1.2</span> <span class="math inline">\(P(x)\)</span> a.k.a. Probability Density Function</a></li>
+  <li><a href="#log-px-a.k.a.-log-pdf" id="toc-log-px-a.k.a.-log-pdf" class="nav-link" data-scroll-target="#log-px-a.k.a.-log-pdf"><span class="header-section-number">2.1.3</span> <span class="math inline">\(log P(x)\)</span> a.k.a. Log PDF</a></li>
+  <li><a href="#dlogpx-a.k.a.-score-function" id="toc-dlogpx-a.k.a.-score-function" class="nav-link" data-scroll-target="#dlogpx-a.k.a.-score-function"><span class="header-section-number">2.1.4</span> <span class="math inline">\(dlogP(x)\)</span> a.k.a. Score Function</a></li>
+  </ul></li>
+  <li><a href="#estimating-the-score-function" id="toc-estimating-the-score-function" class="nav-link" data-scroll-target="#estimating-the-score-function"><span class="header-section-number">2.2</span> Estimating the score function</a>
+  <ul class="collapse">
+  <li><a href="#baseline-evaluate-score-under-known-pdf" id="toc-baseline-evaluate-score-under-known-pdf" class="nav-link" data-scroll-target="#baseline-evaluate-score-under-known-pdf"><span class="header-section-number">2.2.1</span> Baseline: evaluate score under known PDF</a></li>
+  <li><a href="#train-baseline-score-function-model" id="toc-train-baseline-score-function-model" class="nav-link" data-scroll-target="#train-baseline-score-function-model"><span class="header-section-number">2.2.2</span> Train baseline score function model</a></li>
+  </ul></li>
+  <li><a href="#approximate-score-functions" id="toc-approximate-score-functions" class="nav-link" data-scroll-target="#approximate-score-functions"><span class="header-section-number">2.3</span> Approximate Score Functions</a>
+  <ul class="collapse">
+  <li><a href="#neural-network-approximator" id="toc-neural-network-approximator" class="nav-link" data-scroll-target="#neural-network-approximator"><span class="header-section-number">2.3.1</span> Neural Network Approximator</a></li>
+  <li><a href="#training-objectiveloss-function" id="toc-training-objectiveloss-function" class="nav-link" data-scroll-target="#training-objectiveloss-function"><span class="header-section-number">2.3.2</span> Training Objective/Loss Function</a></li>
+  <li><a href="#approximator-performance" id="toc-approximator-performance" class="nav-link" data-scroll-target="#approximator-performance"><span class="header-section-number">2.3.3</span> Approximator Performance</a></li>
+  </ul></li>
+  <li><a href="#mixture-distributions" id="toc-mixture-distributions" class="nav-link" data-scroll-target="#mixture-distributions"><span class="header-section-number">2.4</span> Mixture Distributions</a>
+  <ul class="collapse">
+  <li><a href="#mixture-gaussian-model" id="toc-mixture-gaussian-model" class="nav-link" data-scroll-target="#mixture-gaussian-model"><span class="header-section-number">2.4.1</span> Mixture Gaussian Model</a></li>
+  <li><a href="#mixture-gaussian-score-function" id="toc-mixture-gaussian-score-function" class="nav-link" data-scroll-target="#mixture-gaussian-score-function"><span class="header-section-number">2.4.2</span> Mixture Gaussian Score Function</a></li>
+  <li><a href="#train-neural-network-approximator" id="toc-train-neural-network-approximator" class="nav-link" data-scroll-target="#train-neural-network-approximator"><span class="header-section-number">2.4.3</span> Train neural network approximator</a></li>
+  </ul></li>
+  <li><a href="#component-mixture" id="toc-component-mixture" class="nav-link" data-scroll-target="#component-mixture"><span class="header-section-number">2.5</span> 3-Component Mixture</a></li>
+  <li><a href="#up-next" id="toc-up-next" class="nav-link" data-scroll-target="#up-next"><span class="header-section-number">2.6</span> Up Next</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">2.7</span> References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Score Functions</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>We’re going to need some basic knowledge and terminology established first, otherwise, the terminology may become overwhelming, especially for those who are not well-versed in probabilistic modelling. As such, we’re going to start with a bunch of definitions. Don’t skip these, they’re important!</p>
+<section id="definitions" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="definitions"><span class="header-section-number">2.1</span> Definitions</h2>
+<p>What’s a score function? The score function is defined as follows:</p>
+<blockquote class="blockquote">
+<p>The score function is the gradient of the log of the probability density function of a probability distribution with respect to the distribution’s support.</p>
+</blockquote>
+<p>There’s a lot to unpack in there, so let’s dissect the anatomy of this definition bit by bit.</p>
+<section id="probability-distributions" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="probability-distributions"><span class="header-section-number">2.1.1</span> Probability Distributions</h3>
+<p>Probability distributions are super cool objects in stats<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Distributions can be <strong>configured</strong> through their parameters; for example, by setting the values <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> of a Gaussian respectively. We can use probability distributions to generate data, and we can use them to evaluate the likelihood of observed data. The latter point is done by using a probability distribution’s <strong>probability density function</strong><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+</section>
+<section id="px-a.k.a.-probability-density-function" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="px-a.k.a.-probability-density-function"><span class="header-section-number">2.1.2</span> <span class="math inline">\(P(x)\)</span> a.k.a. Probability Density Function</h3>
+<p>A distribution’s probability density function (PDF) describes the propensity of a probability distribution to generate draws of a particular value. As mentioned above, we primarily use the PDF to <em>evaluate the likelihood of the observing data, given the distribution’s configuration</em>. If you need an anchoring example, think of the venerable Gaussian probability density function in <a href="#fig-likelihood">Figure&nbsp;<span>2.1</span></a>.</p>
+<div class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div id="fig-likelihood" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-likelihood-output-1.png" width="757" height="276" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.1: <span class="math inline">\(P(x)\)</span> (likelihood, PDF), <span class="math inline">\(log P(x)\)</span> (log likelihood, logp), and <span class="math inline">\(dlogP(x)\)</span> (score) of a Gaussian.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Every distribution has a <strong>support</strong>, which is the range of values for which the probability distribution is defined. The Gaussian has support in the range <span class="math inline">\((-\infty, \infty)\)</span>, while positive-only distributions (such as the Exponential) have support in the range <span class="math inline">\((0, \infty)\)</span>.</p>
+</section>
+<section id="log-px-a.k.a.-log-pdf" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="log-px-a.k.a.-log-pdf"><span class="header-section-number">2.1.3</span> <span class="math inline">\(log P(x)\)</span> a.k.a. Log PDF</h3>
+<p>Because the PDF is nothing more than a math function, we can take its logarithm! In computational statistics, taking the log is usually done for pragmatic purposes, as we usually end up with underflow issues otherwise. For the standard Gaussian above, its log PDF looks like what we see in <a href="#fig-likelihood">Figure&nbsp;<span>2.1</span></a>.</p>
+<p>We often call the log PDF <strong>logp</strong> for short, and in the probabilistic programming language PyMC, <code>logp</code> is the name of the class method use for calculating the log likelihood of data under the distribution.</p>
+</section>
+<section id="dlogpx-a.k.a.-score-function" class="level3" data-number="2.1.4">
+<h3 data-number="2.1.4" class="anchored" data-anchor-id="dlogpx-a.k.a.-score-function"><span class="header-section-number">2.1.4</span> <span class="math inline">\(dlogP(x)\)</span> a.k.a. Score Function</h3>
+<p>Finally, we get to the <strong>score</strong>. As it turns out, because the logp function is differentiable, we can take its derivative easily (using JAX, for example). The derivative of the logp function is called the <strong>score function</strong>. The score of a distribution is the gradient of the logp function w.r.t. the support. You can visualize what it is like in <a href="#fig-likelihood">Figure&nbsp;<span>2.1</span></a>.</p>
+<p>In JAX, obtaining the score function is relatively easy. We simply need to use JAX’s <code>grad</code> function to obtain the transformed logp function.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> grad </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>gaussian_score <span class="op">=</span> grad(norm.logpdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since we’re using a Gaussian as our anchoring example, let’s examine some properties of the score function. From visual inspection above, we know that at the top of the Gaussian, the gradient should be zero, and can verify as much.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gaussian_score(<span class="fl">0.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>Array(-0., dtype=float32, weak_type=True)</code></pre>
+</div>
+</div>
+<p>At the tails, the gradient should be of higher magnitude than at the mean.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gaussian_score(<span class="op">-</span><span class="fl">3.0</span>), gaussian_score(<span class="fl">3.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>(Array(3., dtype=float32, weak_type=True),
+ Array(-3., dtype=float32, weak_type=True))</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="estimating-the-score-function" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="estimating-the-score-function"><span class="header-section-number">2.2</span> Estimating the score function</h2>
+<p>In 2005, Aapo Hyvärinen published a paper in the Journal of Machine Learning Research that details how to <em>estimate</em> the score function in the absence of knowledge of the true data generating distribution <span class="citation" data-cites="JMLR:v6:hyvarinen05a">(<a href="#ref-JMLR:v6:hyvarinen05a" role="doc-biblioref">Hyvärinen 2005</a>)</span>. When I first heard of the idea, I thought it was crazy – crazy cool that we could even do this!</p>
+<p>So how do we use data to estimate the score of that data without knowing the true probability density? One key equation in the paper is equation #4. This equation details how we can use an arbitrary function, <span class="math inline">\(\psi(x, \theta)\)</span>, to approximate the score function, and the loss function needed to train the parameters of the function <span class="math inline">\(\theta\)</span> to approximate the score function. I’ve replicated the equation below, alongside a bullet-point explanation of what each of the terms are:</p>
+<p><span class="math display">\[J(\theta) = \frac{1}{T} \sum_{t=1}^{T} \sum_{i=1}^{n} [\delta_i \psi_i(x(t); \theta) + \frac{1}{2} \psi_i(x(t); \theta)^2 ] + \text{const}\]</span></p>
+<p>Here:</p>
+<ul>
+<li><span class="math inline">\(J(\theta)\)</span> is the loss function that we wish to minimize w.r.t. the parameters <span class="math inline">\(\theta\)</span></li>
+<li><span class="math inline">\(\theta\)</span> are the parameters of the function <span class="math inline">\(\psi_i\)</span></li>
+<li><span class="math inline">\(\psi_i(x(t); \theta)\)</span> is the multidimensional score function estimator for <span class="math inline">\(x\)</span>. <span class="math inline">\(\psi_i\)</span> has parameters <span class="math inline">\(\theta\)</span>.
+<ul>
+<li>The subscript <span class="math inline">\(i\)</span> is a dimensional indexer. If <span class="math inline">\(x\)</span> is 2-dimensional, then <span class="math inline">\(i=2\)</span>.</li>
+</ul></li>
+<li><span class="math inline">\(x(t)\)</span> are the i.i.d. samples from the unknown data-generating distribution.</li>
+<li><span class="math inline">\(\delta_i\)</span> refers to the partial derivative w.r.t. dimension <span class="math inline">\(i\)</span> in <span class="math inline">\(x\)</span>.</li>
+<li><span class="math inline">\(\text{const}\)</span> is a constant term that effectively can be ignored.</li>
+</ul>
+<p>Let’s explore the idea in a bit more detail. What we’re ultimately going to do here is use a simple feed-forward neural network as the score function estimator <span class="math inline">\(\psi(x(t), \theta)\)</span>. Let’s start first by generating the kind of data that’s needed for score function estimation to work.</p>
+<div class="cell" data-execution_count="6">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> random</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>key <span class="op">=</span> random.PRNGKey(<span class="dv">44</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>true_mu <span class="op">=</span> <span class="fl">3.0</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>true_sigma <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> random.normal(key, shape<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1</span>)) <span class="op">*</span> true_sigma <span class="op">+</span> true_mu</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>data[<span class="dv">0</span>:<span class="dv">5</span>]  <span class="co"># showing just the first 10 samples drawn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>Array([[0.8219464],
+       [3.8602278],
+       [1.4089172],
+       [3.4423368],
+       [3.2420166]], dtype=float32)</code></pre>
+</div>
+</div>
+<p>Before we go on, we should also verify that the <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> of the data are as close to the ground truth as possible.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data.mean(), data.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>(Array(2.9986677, dtype=float32), Array(1.0197434, dtype=float32))</code></pre>
+</div>
+</div>
+<section id="baseline-evaluate-score-under-known-pdf" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="baseline-evaluate-score-under-known-pdf"><span class="header-section-number">2.2.1</span> Baseline: evaluate score under known PDF</h3>
+<p>Now, let’s try to evaluate the score function directly. The purpose here is to establish a baseline model to compare against and to set up the patterns for training a neural network model. In anticipation of writing neural network models later, I have opted to write our models, neural network or otherwise, in the style of Equinox <span class="citation" data-cites="kidger2021equinox">(<a href="#ref-kidger2021equinox" role="doc-biblioref">Kidger and Garcia 2021</a>)</span>, which provides a way to associate model parameters with a callable object directly while maintaining compatibility with the rest of the JAX ecosystem.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> score_models.models.gaussian <span class="im">import</span> GaussianModel</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect <span class="im">import</span> getsource</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(getsource(GaussianModel))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class GaussianModel(eqx.Module):
+    """Univariate Gaussian score function."""
+
+    mu: np.array = np.array(0.0)
+    log_sigma: np.array = np.array(0.0)
+
+    @eqx.filter_jit
+    def __call__(self, x):
+        """Forward pass.
+
+        :param x: Data. Should be of shape (1, :),
+            where `1` is in the batch dimension slot.
+            as the model is intended to be vmapped over batches of data.
+        :returns: Score of a Gaussian conditioned on a `mu` and `log_sigma`.
+        """
+        gaussian_score_func = jacfwd(norm.logpdf)
+        return gaussian_score_func(x, loc=self.mu, scale=np.exp(self.log_sigma))
+</code></pre>
+</div>
+</div>
+<p>Above, instead of <code>grad</code>, we are using <code>jacfwd</code>, which gives us the Jacobian of <code>norm.logpdf</code>. The Jacobian is a generalization of the first derivative, extended to matrix inputs. To test that we have the implementation done correct, let’s ensure that we can evaluate the <code>GaussianModel</code> score function at a few special points.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>gaussian_model <span class="op">=</span> GaussianModel()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    gaussian_model(<span class="op">-</span><span class="fl">3.0</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    gaussian_model(<span class="fl">0.0</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    gaussian_model(<span class="fl">3.0</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>(Array(3., dtype=float32, weak_type=True),
+ Array(-0., dtype=float32, weak_type=True),
+ Array(-3., dtype=float32, weak_type=True))</code></pre>
+</div>
+</div>
+<p>Let’s also ensure that we can evalute the score function at each data point. We will use the <code>vmap</code> function to explicitly map <code>score_func</code> across all data points.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>data_score <span class="op">=</span> vmap(gaussian_model)(data).squeeze()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>data_score[<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>Array([-0.8219464, -3.8602278, -1.4089172, -3.4423368, -3.2420166],      dtype=float32)</code></pre>
+</div>
+</div>
+</section>
+<section id="train-baseline-score-function-model" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="train-baseline-score-function-model"><span class="header-section-number">2.2.2</span> Train baseline score function model</h3>
+<p>Here, we’ve instantiated the Gaussian with default parameters (<span class="math inline">\(\mu=0\)</span> and <span class="math inline">\(\sigma=1\)</span>), but those aren’t the true configuration of the underlying data-generating process. Hence, our score calculated scores are going to be way off, as is visible in <a href="#fig-score">Figure&nbsp;<span>2.2</span></a>.</p>
+<div class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div id="fig-score" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-score-output-1.png" width="587" height="429" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.2: Comparison of score function evaluated under the true vs.&nbsp;incorrect data-generating distribution parameters</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Since the model is wrong, we’re going to see if we can make it right. One generic way to train models is to use gradient descent; that’s what we’ll use here. For us, we’ll be using optax alongside a fitting routine that I have implemented before.</p>
+<p>Finally, we’ve reached the point where we can implement the score function loss in JAX! Let’s see it below, with the earlier equation from above copied down here for convenience.</p>
+<p><span class="math display">\[J(\theta) = \frac{1}{T} \sum_{t=1}^{T} \sum_{i=1}^{n} [\delta_i \psi_i(x(t); \theta) + \frac{1}{2} \psi_i(x(t); \theta)^2 ] + \text{const}\]</span></p>
+<p>We can now train the model.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> score_models.training <span class="im">import</span> fit</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> score_models.losses <span class="im">import</span> score_matching_loss</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> optax</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optax.adam(learning_rate<span class="op">=</span><span class="fl">5e-3</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>updated_model, loss_history <span class="op">=</span> fit(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    gaussian_model, </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    data, </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    score_matching_loss, </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    optimizer, </span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span><span class="dv">2_000</span>, </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    progress_bar<span class="op">=</span><span class="va">False</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a peek at the loss curve to make sure our model is fitting.</p>
+<div class="cell" data-execution_count="13">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>), ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.plot(loss_history)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Training Iteration"</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score Matching Loss"</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Score Matching Loss History"</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>updated_model_scores <span class="op">=</span> vmap(updated_model)(data)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(updated_model_scores.squeeze(), true_model_scores.squeeze())</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Estimated Scores"</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"True Model"</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"True vs. Estimated Score"</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-gaussian-model-loss-history" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-gaussian-model-loss-history-output-1.png" width="651" height="376" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.3: Loss curve for Gaussian score model.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>It’s reassuring to see the loss decrease and the estimated scores match up with the predicted scores.</p>
+<p>And here are the mean and standard deviation of the data vs.&nbsp;the model estimates.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>np.mean(data), np.std(data), updated_model.mu, np.exp(updated_model.log_sigma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>(Array(2.9986677, dtype=float32),
+ Array(1.0197434, dtype=float32),
+ Array(2.9963465, dtype=float32),
+ Array(1.0235366, dtype=float32))</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="approximate-score-functions" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="approximate-score-functions"><span class="header-section-number">2.3</span> Approximate Score Functions</h2>
+<p>Now, the entire premise of Hyvärinen’s paper is that we need not know the original form of the PDF and we’d still be able to <em>estimate</em> the score at each data point. Since the score function is smooth and differentiable, we can reach for the venerable neural network, a.k.a. the universal function approximator, as our estimation model for the score of our data.</p>
+<section id="neural-network-approximator" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="neural-network-approximator"><span class="header-section-number">2.3.1</span> Neural Network Approximator</h3>
+<p>Here, we will set up a single feed-forward neural network model with 1 hidden layer of width 1024 and a ReLU activation function. Here is the source of my wrapper implementation around Equinox’s MLP.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> score_models.models.feedforward <span class="im">import</span> FeedForwardModel1D</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(getsource(FeedForwardModel1D))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class FeedForwardModel1D(eqx.Module):
+    """Feed-forward NN model."""
+
+    mlp: eqx.Module
+
+    def __init__(
+        self,
+        in_size=1,
+        out_size=1,
+        width_size=4096,
+        depth=1,
+        activation=nn.relu,
+        key=random.PRNGKey(45),
+    ):
+        self.mlp = eqx.nn.MLP(
+            in_size=in_size,
+            out_size=out_size,
+            width_size=width_size,
+            depth=depth,
+            activation=activation,
+            key=key,
+        )
+
+    @eqx.filter_jit
+    def __call__(self, x):
+        """Forward pass.
+
+        :param x: Data. Should be of shape (1, :),
+            as the model is intended to be vmapped over batches of data.
+        :returns: Estimated score of a Gaussian.
+        """
+        return self.mlp(x)
+</code></pre>
+</div>
+</div>
+</section>
+<section id="training-objectiveloss-function" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="training-objectiveloss-function"><span class="header-section-number">2.3.2</span> Training Objective/Loss Function</h3>
+<p>For our loss function, I know from previous experience with these models that we could get weights that explode to really large magnitudes. To control this, I have chained in an L2 regularization on the weights on the loss function.</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> nn </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> score_models <span class="im">import</span> losses</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>regularized_loss <span class="op">=</span> losses.chain(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    losses.l2_norm, </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    losses.score_matching_loss,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can train the model.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ffmodel <span class="op">=</span> FeedForwardModel1D(depth<span class="op">=</span><span class="dv">1</span>, width_size<span class="op">=</span><span class="dv">1024</span>, activation<span class="op">=</span>nn.relu)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optax.chain(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    optax.clip(<span class="fl">0.01</span>),</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    optax.sgd(learning_rate<span class="op">=</span><span class="fl">5e-3</span>),</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>updated_model, history <span class="op">=</span> fit(</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    ffmodel,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    regularized_loss,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    optimizer,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span><span class="dv">2_000</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    progress_bar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="approximator-performance" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="approximator-performance"><span class="header-section-number">2.3.3</span> Approximator Performance</h3>
+<p>Now, let’s visualize the training loss and how the model compares to ground truth.</p>
+<div class="cell" data-execution_count="18">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>), ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>plt.plot(loss_history)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Training Iteration"</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Loss Value"</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Score Matching Loss History"</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>updated_model_scores <span class="op">=</span> vmap(updated_model)(data).squeeze()</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(data.squeeze(), true_model_scores, label<span class="op">=</span><span class="st">"True Model Scores"</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(data.squeeze(), updated_model_scores, label<span class="op">=</span><span class="st">"Feed Forward Estimate"</span>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"True vs. Estimated Score"</span>)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-nn-model-loss-and-perf" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-nn-model-loss-and-perf-output-1.png" width="651" height="376" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.4: Loss curve and performance plot for Neural Network score model.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>This isn’t bad at all! We’re off by a bit, but keep in mind that we only had data on hand and didn’t know what the exact data-generating density is. We should expect to be a bit off.</p>
+</section>
+</section>
+<section id="mixture-distributions" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="mixture-distributions"><span class="header-section-number">2.4</span> Mixture Distributions</h2>
+<p>While data drawn from a Gaussian is nice and ideal, you won’t really be able to tell if your data came from a Gaussian<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. In addition, most data would have the characteristics of being generated from a mixture distribution. In other words, mixture distributions are what our data will look the most like. Let’s make sure our approximate score function can approximate the mixture distribution scores as accurately as possible, at least in 1 dimension.</p>
+<section id="mixture-gaussian-model" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="mixture-gaussian-model"><span class="header-section-number">2.4.1</span> Mixture Gaussian Model</h3>
+<p>We have a <code>MixtureGaussian</code> model that implements the score of a mixture Gaussian distribution. Its source is below:</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> score_models.models.gaussian <span class="im">import</span> MixtureGaussian</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(getsource(MixtureGaussian))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class MixtureGaussian(eqx.Module):
+    """Mixture Gaussian score function."""
+
+    mus: np.array
+    log_sigmas: np.array
+    ws: np.array
+
+    def __init__(self, mus, log_sigmas, ws):
+        self.mus = mus
+        self.log_sigmas = log_sigmas
+        self.ws = ws
+
+        # Check that mus, log_sigmas, and ws are of the same length.
+        lengths = set(map(len, [mus, log_sigmas, ws]))
+        if len(lengths) != 1:
+            raise ValueError(
+                "`mus`, `log_sigmas` and `ws` must all be of the same length!"
+            )
+
+    @eqx.filter_jit
+    def __call__(self, x):
+        """Forward pass.
+
+        :param x: Data. Should be of shape (1, :),
+            where `1` is in the batch dimension slot.
+            as the model is intended to be vmapped over batches of data.
+        :returns: Score of a Gaussian conditioned on a `mu` and `log_sigma`.
+        """
+        return partial(
+            dmixture_logpdf,
+            mus=self.mus,
+            sigmas=np.exp(self.log_sigmas),
+            ws=self.ws,
+        )(x)
+</code></pre>
+</div>
+</div>
+</section>
+<section id="mixture-gaussian-score-function" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="mixture-gaussian-score-function"><span class="header-section-number">2.4.2</span> Mixture Gaussian Score Function</h3>
+<p>Let’s use the model to plot Gaussian data and the true Gaussian mixture score.</p>
+<div class="cell" data-execution_count="20">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> onp </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">200</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>mus <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>])</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>sigmas <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>ws <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.9</span>])</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>mgmodel <span class="op">=</span> MixtureGaussian(mus, np.log(sigmas), ws)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>mixture_logpdf_grads <span class="op">=</span> vmap(mgmodel)(x)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>), ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>k1, k2 <span class="op">=</span> random.split(random.PRNGKey(<span class="dv">55</span>))</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>draws <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>mix1 <span class="op">=</span> random.normal(k1, shape<span class="op">=</span>(<span class="dv">1000</span>,)) <span class="op">*</span> <span class="dv">1</span> <span class="op">-</span> <span class="dv">3</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>mix2 <span class="op">=</span> random.normal(k2, shape<span class="op">=</span>(<span class="dv">9000</span>,)) <span class="op">*</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.concatenate([mix1, mix2]).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>plt.hist(onp.array(data), bins<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Mixture Gaussian Histogram"</span>)</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Count"</span>)</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>plt.plot(x, mixture_logpdf_grads)</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Mixture Gaussian Score"</span>)</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-two-comp-mixture-gaussian" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-two-comp-mixture-gaussian-output-1.png" width="668" height="376" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.5: A two-component mixture Gaussian and its score function</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="train-neural-network-approximator" class="level3" data-number="2.4.3">
+<h3 data-number="2.4.3" class="anchored" data-anchor-id="train-neural-network-approximator"><span class="header-section-number">2.4.3</span> Train neural network approximator</h3>
+<p>Then, we’re going to use the feed forward neural network model from before to try to fit the mixture Gaussian data above.</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optax.chain(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    optax.clip(<span class="fl">0.01</span>),</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    optax.sgd(learning_rate<span class="op">=</span><span class="fl">5e-3</span>),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>updated_model, history <span class="op">=</span> fit(</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    ffmodel,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    losses.score_matching_loss,</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    optimizer,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span><span class="dv">1_000</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    progress_bar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s see how the loss looks like:</p>
+<div class="cell" data-execution_count="22">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>), ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>plt.plot(loss_history)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Training Iteration"</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score Matching Loss"</span>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Score Matching Loss History"</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>mixture_est_scores <span class="op">=</span> vmap(updated_model)(data)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>plt.plot(x, mixture_logpdf_grads, label<span class="op">=</span><span class="st">"Ground Truth"</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(data, mixture_est_scores, label<span class="op">=</span><span class="st">"Estimated"</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"True vs. Estimated Score"</span>)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-nn-model-mixture-loss-history" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-nn-model-mixture-loss-history-output-1.png" width="651" height="376" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.6: Loss curve for neural network score model approximator for 2-component mixture Gaussian.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Not bad! It’s clear to me that we can approxiate the score function of a 2-component mixture Gaussian here.</p>
+</section>
+</section>
+<section id="component-mixture" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="component-mixture"><span class="header-section-number">2.5</span> 3-Component Mixture</h2>
+<p>We’re now going to see whether we can approximate a 3-component mixture. This will be the example that rounds out this chapter. Firstly, let’s see draws from a 3-component mixture model and the score function of this mixture distribution.</p>
+<div class="cell" data-execution_count="23">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>mus <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">7</span>, <span class="op">-</span><span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>sigmas <span class="op">=</span> np.ones(<span class="dv">3</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>ws <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>])</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>), ncols<span class="op">=</span><span class="dv">2</span>, sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>k1, k2, k3 <span class="op">=</span> random.split(random.PRNGKey(<span class="dv">91</span>), <span class="dv">3</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>draws <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>mix1 <span class="op">=</span> random.normal(k1, shape<span class="op">=</span>(<span class="dv">100</span>,)) <span class="op">*</span> <span class="dv">1</span> <span class="op">-</span> <span class="dv">7</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>mix2 <span class="op">=</span> random.normal(k2, shape<span class="op">=</span>(<span class="dv">400</span>,)) <span class="op">*</span> <span class="dv">1</span> <span class="op">-</span> <span class="dv">2</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>mix3 <span class="op">=</span> random.normal(k3, shape<span class="op">=</span>(<span class="dv">500</span>,)) <span class="op">*</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.concatenate([mix1, mix2, mix3]).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>plt.hist(onp.array(data), bins<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Count"</span>)</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Mixture Gaussian Histogram"</span>)</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">11</span>, <span class="dv">6</span>, <span class="dv">1000</span>)</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>three_comp_gaussian <span class="op">=</span> MixtureGaussian(mus, np.log(sigmas), ws)</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>mixture_logpdf_grads <span class="op">=</span> vmap(three_comp_gaussian)(x)</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>plt.plot(x, mixture_logpdf_grads)</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Mixture Gaussian Score"</span>)</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-3-comp-gaussian-mixture-score-func" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-3-comp-gaussian-mixture-score-func-output-1.png" width="659" height="376" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.7: 3-component mixture Gaussian score function.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Now, let’s train a 3-component Gaussian model and check its performance. This again serves as our baseline.</p>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sanity check that this works with a MixtureGaussianModel</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>three_comp_gaussian_est <span class="op">=</span> MixtureGaussian(mus, np.log(sigmas), np.ones(<span class="dv">3</span>) <span class="op">/</span> <span class="dv">3</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optax.chain(</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    optax.clip(<span class="fl">0.001</span>),</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    optax.adam(learning_rate<span class="op">=</span><span class="fl">5e-3</span>),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>updated_model, history <span class="op">=</span> fit(</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    three_comp_gaussian_est, data, losses.score_matching_loss, optimizer, steps<span class="op">=</span><span class="dv">100</span>, progress_bar<span class="op">=</span><span class="va">False</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="25">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>plt.plot(history)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Iteration"</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Loss"</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Score Matching Loss History"</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>mixture_est_scores <span class="op">=</span> vmap(updated_model)(data)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>plt.plot(x, mixture_logpdf_grads, label<span class="op">=</span><span class="st">"Ground Truth"</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(data, mixture_est_scores, label<span class="op">=</span><span class="st">"Estimated Scores"</span>)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Support"</span>)</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"True vs. Baseline Score"</span>)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-ground-truth-3-comp-gaussian" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-ground-truth-3-comp-gaussian-output-1.png" width="692" height="376" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.8: Training performance of a 3-component Gaussian model trained on the sampled data.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Now, we’re going to train a neural network model.</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> partial</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: I needed to tweak this neural network's</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># activation function, architecture, and number of training steps quite a bit.</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Recording here the thing that trains most stably:</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># - 2000 steps</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - depth = 2, width_size = 512, activation = nn.softplus</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - optax.clip(0.001), optax.adam(learning_rate = 5e-3)</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co"># - lossses.score_matching_loss, don't do regularized.</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>ffmodel <span class="op">=</span> FeedForwardModel1D(depth<span class="op">=</span><span class="dv">2</span>, width_size<span class="op">=</span><span class="dv">512</span>, activation<span class="op">=</span>nn.softplus)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optax.chain(</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    optax.clip(<span class="fl">0.0001</span>),</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    optax.adam(learning_rate<span class="op">=</span><span class="fl">5e-3</span>),</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>updated_model, history <span class="op">=</span> fit(</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>    ffmodel,</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>    losses.score_matching_loss,</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>    optimizer,</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span><span class="dv">5_000</span>,</span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>    progress_bar<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"7b85ecea40cd4c78a8f6629076dbc53f","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">0</span>])</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>plt.plot(history)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Score Matching Loss History"</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>sns.despine()</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>plt.sca(axes[<span class="dv">1</span>])</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>mixture_est_scores <span class="op">=</span> vmap(updated_model)(data)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>plt.plot(x, mixture_logpdf_grads, label<span class="op">=</span><span class="st">"True"</span>)</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>plt.scatter(data, mixture_est_scores, label<span class="op">=</span><span class="st">"Estimated"</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"True vs. Estimated Score"</span>)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-3comp-mixture-nn-performance" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="01-score-function_files/figure-html/fig-3comp-mixture-nn-performance-output-1.png" width="649" height="357" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2.9: Training performance of feed forward neural network on 3-component Gaussian mixture.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Not bad, this actually works! Although in this case we do know the true score function, we are actually trying to <em>estimate</em> it in the presence of draws from the data-generating distribution while pretending to not know the true data-generating distribution. What I’ve tried to show here is that a neural network model can approximate the true score function, as shown in <a href="#fig-3comp-mixture-nn-performance">Figure&nbsp;<span>2.9</span></a> and <a href="#fig-nn-model-mixture-loss-history">Figure&nbsp;<span>2.6</span></a>.</p>
+</section>
+<section id="up-next" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="up-next"><span class="header-section-number">2.6</span> Up Next</h2>
+<p>Coming up next is how we <em>sample</em> from a distribution when knowing <em>only</em> the score function, true or estimated.</p>
+</section>
+<section id="references" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="references"><span class="header-section-number">2.7</span> References</h2>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-JMLR:v6:hyvarinen05a" class="csl-entry" role="listitem">
+Hyvärinen, Aapo. 2005. <span>“Estimation of Non-Normalized Statistical Models by Score Matching.”</span> <em>Journal of Machine Learning Research</em> 6 (24): 695–709. <a href="http://jmlr.org/papers/v6/hyvarinen05a.html">http://jmlr.org/papers/v6/hyvarinen05a.html</a>.
+</div>
+<div id="ref-kidger2021equinox" class="csl-entry" role="listitem">
+Kidger, Patrick, and Cristian Garcia. 2021. <span>“<span>E</span>quinox: Neural Networks in <span>JAX</span> via Callable <span>P</span>y<span>T</span>rees and Filtered Transformations.”</span> <em>Differentiable Programming Workshop at Neural Information Processing Systems 2021</em>.
+</div>
+</div>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>I’ve explored the anatomy of a probability distribution in my essay on <a href="https://ericmjl.github.io/essays-on-data-science/machine-learning/computational-bayesian-stats/">Bayesian and computational statistics</a>, and would recommend looking at it for a refresher.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Or the probability mass function, for discrete distributions, but we’re going to stick with continuous distributions for this essay.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Allen Downey has an <a href="http://allendowney.blogspot.com/2013/08/are-my-data-normal.html">excellent blog post</a> on this matter.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"state":{"2283b7511fca4691a865302fe109658f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_4f3589fbb2554eaba2e125e336d55191","placeholder":"​","style":"IPY_MODEL_e12938299bcf4410ad1ea549bd59b2ec","tabbable":null,"tooltip":null,"value":" 5000/5000 [03:00&lt;00:00, 27.95it/s]"}},"2ce89e0377124e5e86d899ba532c148f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"4f3589fbb2554eaba2e125e336d55191":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"506121add74f462eb180fea807692a0a":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"6399926e0a9f40f692972fd56ebc4fd4":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_506121add74f462eb180fea807692a0a","max":5000,"min":0,"orientation":"horizontal","style":"IPY_MODEL_eed106fa21034fd8873d19b46e2fc99e","tabbable":null,"tooltip":null,"value":5000}},"7b85ecea40cd4c78a8f6629076dbc53f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_b9e28f7110594a299d3e8883acc8e8b3","IPY_MODEL_6399926e0a9f40f692972fd56ebc4fd4","IPY_MODEL_2283b7511fca4691a865302fe109658f"],"layout":"IPY_MODEL_b980382d56074f60b14f9982a64065ac","tabbable":null,"tooltip":null}},"8893242849df4af6b32873da51f8acb3":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b980382d56074f60b14f9982a64065ac":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b9e28f7110594a299d3e8883acc8e8b3":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_8893242849df4af6b32873da51f8acb3","placeholder":"​","style":"IPY_MODEL_2ce89e0377124e5e86d899ba532c148f","tabbable":null,"tooltip":null,"value":"100%"}},"e12938299bcf4410ad1ea549bd59b2ec":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"eed106fa21034fd8873d19b46e2fc99e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}}},"version_major":2,"version_minor":0}
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../index.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Pedagogical Introduction to Score Models</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/02-langevin-dynamics.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Langevin Dynamics</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">Copyright 2022-present, Eric J. Ma</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
